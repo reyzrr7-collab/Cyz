@@ -1699,16 +1699,26 @@ def get_understat_xg(params_json: str) -> str:
                 return team_name, None
 
 
-            xg_list  = [float(m["xG"]["h"]) if m["h"]["title"] == team_name
+            # Filter match yang xG-nya None (data Understat belum tersedia)
+            done = [
+                m for m in done
+                if m.get("xG") and m["xG"].get("h") is not None and m["xG"].get("a") is not None
+            ]
+
+            if not done:
+                return team_name, None
 
 
-                        else float(m["xG"]["a"]) for m in done]
+            xg_list  = [float(m["xG"]["h"] or 0) if m["h"]["title"] == team_name
 
 
-            xga_list = [float(m["xG"]["a"]) if m["h"]["title"] == team_name
+                        else float(m["xG"]["a"] or 0) for m in done]
 
 
-                        else float(m["xG"]["h"]) for m in done]
+            xga_list = [float(m["xG"]["a"] or 0) if m["h"]["title"] == team_name
+
+
+                        else float(m["xG"]["h"] or 0) for m in done]
 
 
             goals_list = [int(m["goals"]["h"]) if m["h"]["title"] == team_name
